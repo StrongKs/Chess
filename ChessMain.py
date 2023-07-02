@@ -20,7 +20,7 @@ Initialize a global dictionary of a image. This will be called exactly once in t
 def loadImages():
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = pygame.image.load(f"venv/images/{piece}.png"), (SQ_SIZE, SQ_SIZE)
+        IMAGES[piece] = pygame.transform.scale(pygame.image.load(f"venv/images/{piece}.png"), (SQ_SIZE, SQ_SIZE))
     #   Note: we can access an image by using 'IMAGES'
 
 
@@ -76,7 +76,11 @@ Draw the pieces on the board using the current GameState.board
 
 
 def drawPieces(screen, board):
-    pass
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            piece = board[r][c]
+            if piece != "--":   # not empty  square
+                screen.blit(IMAGES[piece], pygame.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 if __name__ == "__main__":
