@@ -32,15 +32,37 @@ The main driver for our code. This will handle user input and updating the graph
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Chess Practice", "icon")
+    icon = pygame.image.load(f"venv/images/bK.png").convert()
+    pygame.display.set_icon(icon)   # set window icon
     clock = pygame.time.Clock()
     screen.fill(pygame.Color("white"))
     gameState = ChessEngine.GameState()
     loadImages()  # only do this once, before the while loop
     running = True
+    sqSelected = ()    # no square is selected, keep track of the last click of the user (tuple: (row, col))
+    playerClicks = []   # keep track of player clicks (two tuples: [(6, 4), (4, 4)])
     while running:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                location = pygame.mouse.get_pos()   # (x, y) location of mouse
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                if sqSelected == (row, col):   # user clicked the same square twice
+                    sqSelected = ()    # deselected
+                    playerClicks = {}    # clear player clicks
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected)    # append for both 1st and 2nd clicks
+                if len(playerClicks) == 2:    # after 2nd click
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gameState.board)
+                    print(move.getChessNotation())
+                    gameState.makeMove(move)
+                    sqSelected = ()   # reset user clicks
+                    playerClicks = []
+
         drawGameState(screen, gameState)
         clock.tick(MAX_FPS)
         pygame.display.flip()
